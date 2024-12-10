@@ -64,5 +64,7 @@ Wartości `NA` w kolumnie `NAME_TYPE_SUITE` zostały zastąpione losowymi warto�
 
 Po naprawie, liczba braków w tej kolumnie wynosi 0.
 
+Dane zapisano w nowym pliku: `previous_application_cleaned220241210_115342.csv`.
+
 ---
 

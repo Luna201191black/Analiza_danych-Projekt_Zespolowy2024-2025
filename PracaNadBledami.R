@@ -218,55 +218,37 @@ Oczyszczone dane zostały zapisane do pliku:
 Proces analizy danych został zakończony pomyślnie. Wyniki można znaleźć w pliku wyjściowym.
 ")
 
-# Zapisanie raportu do pliku README.md
-writeLines(readme_content, con = readme_path)
-
-cat(paste("Raport zapisano do pliku:", readme_path, "\n"))
-
-# Funkcja do dopisywania treści do README.md 
-append_to_readme <- function(content, path) {
-  write(content, file = path, append = TRUE)
-}
-
 # Ścieżka do istniejącego pliku README.md
 readme_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/README.md"
 
 # ********************************************************
 # 9. Dopisywanie nowych analiz do README.md
 # ********************************************************
-# Kontynuacja napraw braków w 'data_cleaned'
-# ********************************************************
 
-#komunikat
+# Komunikat
 cat("Kontynuacja napraw braków w danych liczbowych i kategorycznych w 'data_cleaned'...\n")
 
+# Wczytywanie danych z pliku CSV
+cat("Wczytywanie danych z pliku CSV...\n")
 
-#komunikat
-cat("Wczytywanie danych z pliku danych CSV...\n")
-
-# Ścieżka do pliku.
-dane <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned.csv"
-
-# Wczytanie danych z pliku CSV
-data_cleaned <- read.csv(dane, stringsAsFactors = FALSE)
-
+# Ścieżka do pliku
+input_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned.csv"
+data_cleaned <- read.csv(input_path, stringsAsFactors = FALSE)
 
 # ********************************************************
-# 10.  Kontynuacja napraw braków w 'data_cleaned'.Naprawa kolumny NAME_TYPE_SUITE 
+# 10. Naprawa braków w 'data_cleaned' w kolumnie NAME_TYPE_SUITE
 # ********************************************************
-
 
 # Sprawdzenie unikalnych wartości
 cat("Unikalne wartości w kolumnie NAME_TYPE_SUITE:\n")
 unique_values <- unique(data_cleaned$NAME_TYPE_SUITE)
 print(unique_values)
 
-
-# Usuwamy NA z listy unikalnych wartości
+# Usuwanie NA z listy unikalnych wartości
 existing_values <- na.omit(unique(data_cleaned$NAME_TYPE_SUITE))
 
-# Zastępujemy NA losową wartością z listy unikalnych wartości
-set.seed(123)  
+# Zastępowanie NA losowymi wartościami
+set.seed(123)
 data_cleaned$NAME_TYPE_SUITE[is.na(data_cleaned$NAME_TYPE_SUITE)] <- sample(
   existing_values, 
   sum(is.na(data_cleaned$NAME_TYPE_SUITE)), 
@@ -274,29 +256,30 @@ data_cleaned$NAME_TYPE_SUITE[is.na(data_cleaned$NAME_TYPE_SUITE)] <- sample(
 )
 
 cat("Wszystkie wartości NA w kolumnie NAME_TYPE_SUITE zostały zastąpione losowymi wartościami z istniejącej listy.\n")
-data_cleaned <- read.csv(dane, stringsAsFactors = FALSE)
-
 
 # ********************************************************
-# 11. Zapisanie wyników po zmianach do pliku previous_application_cleaned.csv
+# 11. Zapisanie wyników po zmianach do nowego pliku
 # ********************************************************
 
-output_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned.csv"
+# Tworzenie unikalnej nazwy pliku na podstawie daty i godziny
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+output_path <- paste0("C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned2", timestamp, ".csv")
+
 write.csv(data_cleaned, output_path, row.names = FALSE)
 
-cat(paste("Zaktualizowane dane zapisano do pliku:", output_path, "\n"))
+cat(paste("Zaktualizowane dane zapisano do nowego pliku:", output_path, "\n"))
 
-
-
-# 12. Aktualizacja podsumowania
+# ********************************************************
+# 12. Aktualizacja README.md
+# ********************************************************
 
 # Funkcja do dopisywania zawartości do README.md
 append_to_readme <- function(content, path) {
-  write(content, file = path, append = TRUE)  
+  write(content, file = path, append = TRUE)
 }
 
-# Dopisanie nowej sekcji  po zmianach do pliku README.md
-new_content <- "
+# Dopisanie nowej sekcji do README.md
+new_content <- paste0("
 ### 4.1. Aktualizacja po zmianach w NAME_TYPE_SUITE
 
 Wartości `NA` w kolumnie `NAME_TYPE_SUITE` zostały zastąpione losowymi wartościami z istniejących danych:
@@ -310,10 +293,11 @@ Wartości `NA` w kolumnie `NAME_TYPE_SUITE` zostały zastąpione losowymi warto�
 
 Po naprawie, liczba braków w tej kolumnie wynosi 0.
 
+Dane zapisano w nowym pliku: `", basename(output_path), "`.
+
 ---
-"
+")
 
 append_to_readme(new_content, readme_path)
 
 cat("Zmiany zostały dopisane do README.md.\n")
-
