@@ -130,3 +130,28 @@ Dane zapisano w nowym pliku: `previous_application_cleaned5_20241210_131100.csv`
 
 ---
 
+
+
+### 4.5. Aktualizacja po zmianach w CODE_REJECT_REASON
+
+Wartości `XNA` i `XAP` w kolumnie `CODE_REJECT_REASON` zostały zastąpione nowymi propozycjami:
+- Fraud Risk
+- Incomplete Documents
+- Insufficient History
+- Technical Error
+
+Wszystkie inne wartości zostały zachowane:
+- HC
+- LIMIT
+- SCO
+- CLIENT
+- SCOFR
+- VERIF
+- SYSTEM
+
+Po naprawie, liczba braków w tej kolumnie wynosi 0.
+
+Dane zapisano w nowym pliku: `previous_application_cleaned6_20241210_132916.csv`.
+
+---
+

@@ -543,3 +543,90 @@ append_to_readme(new_content, readme_path)
 
 cat("Zmiany zostały dopisane do README.md.\n")
 
+
+
+# Ścieżka do istniejącego pliku README.md
+readme_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/README.md"
+
+# ********************************************************
+# 25. Dopisywanie nowych analiz do README.md
+# ********************************************************
+
+# Komunikat
+cat("Kontynuacja napraw braków w danych liczbowych i kategorycznych w 'previous_application_cleaned5_20241210_131100.csv'...\n")
+
+# Wczytywanie danych z pliku CSV
+cat("Wczytywanie danych z pliku CSV...\n")
+
+# Ścieżka do pliku
+input_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned5_20241210_131100.csv"
+
+data_cleaned5 <- read.csv(input_path, stringsAsFactors = FALSE)
+
+# ********************************************************
+# 26. Naprawa braków w 'data_cleaned5' w kolumnie CODE_REJECT_REASON
+# ********************************************************
+
+# Definiowanie nowych propozycji wartości
+new_reject_reasons <- c("Fraud Risk", "Incomplete Documents", "Insufficient History", "Technical Error")
+
+# Zastąpienie tylko wartości 'XNA' i 'XAP' nowymi propozycjami
+set.seed(123)
+data_cleaned5$CODE_REJECT_REASON[data_cleaned5$CODE_REJECT_REASON %in% c("XNA", "XAP")] <- sample(
+  new_reject_reasons, 
+  sum(data_cleaned5$CODE_REJECT_REASON %in% c("XNA", "XAP")), 
+  replace = TRUE
+)
+
+cat("Wartości 'XNA' i 'XAP' w kolumnie CODE_REJECT_REASON zostały zastąpione nowymi propozycjami.\n")
+
+# ********************************************************
+# 27. Zapisanie wyników po zmianach do nowego pliku
+# ********************************************************
+
+# Tworzenie unikalnej nazwy pliku
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+output_path <- paste0("C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned6_", timestamp, ".csv")
+
+write.csv(data_cleaned5, output_path, row.names = FALSE)
+
+cat(paste("Zaktualizowane dane zapisano do nowego pliku:", output_path, "\n"))
+
+# ********************************************************
+# 28. Aktualizacja README.md
+# ********************************************************
+
+# Dopisanie nowej sekcji do README.md
+new_content <- paste0("
+### 4.5. Aktualizacja po zmianach w CODE_REJECT_REASON
+
+Wartości `XNA` i `XAP` w kolumnie `CODE_REJECT_REASON` zostały zastąpione nowymi propozycjami:
+- Fraud Risk
+- Incomplete Documents
+- Insufficient History
+- Technical Error
+
+Wszystkie inne wartości zostały zachowane:
+- HC
+- LIMIT
+- SCO
+- CLIENT
+- SCOFR
+- VERIF
+- SYSTEM
+
+Po naprawie, liczba braków w tej kolumnie wynosi 0.
+
+Dane zapisano w nowym pliku: `", basename(output_path), "`.
+
+---
+")
+
+# Dopisanie do README.md
+append_to_readme <- function(content, path) {
+  write(content, file = path, append = TRUE)
+}
+
+append_to_readme(new_content, readme_path)
+
+cat("Zmiany zostały dopisane do README.md.\n")
