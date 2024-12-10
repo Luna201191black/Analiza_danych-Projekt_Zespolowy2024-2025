@@ -166,3 +166,21 @@ Dane zapisano w nowym pliku: `previous_application_cleaned7_20241210_134237.csv`
 
 ---
 
+
+### 4.7. Aktualizacja po zmianach w NAME_PORTFOLIO
+
+Wartości `XNA` w kolumnie `NAME_PORTFOLIO` zostały zastąpione losowymi wartościami z istniejących oraz nowych kategorii:
+- POS
+- Cash
+- Cards
+- Cars
+- Savings
+- Investments
+- Insurance
+
+Po naprawie, liczba braków w tej kolumnie wynosi 0.
+
+Dane zapisano w nowym pliku: `previous_application_cleaned8_20241210_140142.csv`.
+
+---
+
