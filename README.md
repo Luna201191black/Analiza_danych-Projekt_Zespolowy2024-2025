@@ -50,3 +50,19 @@ Oczyszczone dane zostały zapisane do pliku:
 ## 4. Podsumowanie
 Proces analizy danych został zakończony pomyślnie. Wyniki można znaleźć w pliku wyjściowym.
 
+
+### 4.1. Aktualizacja po zmianach w NAME_TYPE_SUITE
+
+Wartości `NA` w kolumnie `NAME_TYPE_SUITE` zostały zastąpione losowymi wartościami z istniejących danych:
+- Unaccompanied
+- Spouse, partner
+- Family
+- Children
+- Other_B
+- Other_A
+- Group of people
+
+Po naprawie, liczba braków w tej kolumnie wynosi 0.
+
+---
+
