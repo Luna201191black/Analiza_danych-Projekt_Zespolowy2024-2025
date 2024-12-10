@@ -413,9 +413,9 @@ new_proposals <- c("Investment", "Vacation", "Home Renovation", "Education", "He
 
 # Zastąpienie 'XNA' i 'XAP' nowymi wartościami
 set.seed(123)
-data_cleaned2$NAME_CASH_LOAN_PURPOSE[data_cleaned2$NAME_CASH_LOAN_PURPOSE %in% c("XNA", "XAP")] <- sample(
+data_cleaned3$NAME_CASH_LOAN_PURPOSE[data_cleaned3$NAME_CASH_LOAN_PURPOSE %in% c("XNA", "XAP")] <- sample(
   new_proposals, 
-  sum(data_cleaned2$NAME_CASH_LOAN_PURPOSE %in% c("XNA", "XAP")), 
+  sum(data_cleaned3$NAME_CASH_LOAN_PURPOSE %in% c("XNA", "XAP")), 
   replace = TRUE
 )
 
