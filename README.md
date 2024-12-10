@@ -68,3 +68,33 @@ Dane zapisano w nowym pliku: `previous_application_cleaned220241210_115342.csv`.
 
 ---
 
+
+### 4.2. Aktualizacja po zmianach w NAME_YIELD_GROUP
+
+Wartości `XNA` w kolumnie `NAME_YIELD_GROUP` zostały zastąpione losowymi wartościami z istniejących danych:
+- middle
+- high
+- low_normal
+- low_action
+
+Po naprawie, liczba braków w tej kolumnie wynosi 0.
+
+Dane zapisano w nowym pliku: `previous_application_cleaned3.csv`.
+
+---
+
+
+### 4.2. Aktualizacja po zmianach w NAME_YIELD_GROUP
+
+Wartości `XNA` w kolumnie `NAME_YIELD_GROUP` zostały zastąpione losowymi wartościami z istniejących danych:
+- middle
+- high
+- low_normal
+- low_action
+
+Po naprawie, liczba braków w tej kolumnie wynosi 0.
+
+Dane zapisano w nowym pliku: `previous_application_cleaned3_20241210_123023.csv`.
+
+---
+
