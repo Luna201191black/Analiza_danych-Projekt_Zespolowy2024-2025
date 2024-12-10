@@ -98,3 +98,20 @@ Dane zapisano w nowym pliku: `previous_application_cleaned3_20241210_123023.csv`
 
 ---
 
+
+### 4.3. Aktualizacja po zmianach w NAME_CASH_LOAN_PURPOSE
+
+Wartości `XNA` i `XAP` w kolumnie `NAME_CASH_LOAN_PURPOSE` zostały zastąpione nowymi propozycjami:
+- Investment
+- Vacation
+- Home Renovation
+- Education
+- Health Treatment
+- Office Equipment
+
+Po naprawie, liczba braków w tej kolumnie wynosi 0.
+
+Dane zapisano w nowym pliku: `previous_application_cleaned4_20241210_124631.csv`.
+
+---
+

@@ -325,19 +325,14 @@ data_cleaned2 <- read.csv(input_path, stringsAsFactors = FALSE)
 # 14. Naprawa braków w 'data_cleaned2' w kolumnie NAME_YIELD_GROUP
 # ********************************************************
 
-# Sprawdzenie unikalnych wartości
-cat("Unikalne wartości w kolumnie NAME_YIELD_GROUP:\n")
-unique_values <- unique(data_cleaned2$NAME_YIELD_GROUP)
-print(unique_values)
+# Usuwanie 'XNA' z listy unikalnych wartości
+existing_values <- unique(data_cleaned2$NAME_YIELD_GROUP[data_cleaned2$NAME_YIELD_GROUP != "XNA"])
 
-# Usuwanie XNA z listy unikalnych wartości
-existing_values <- na.omit(unique(data_cleaned2$NAME_YIELD_GROUP))
-
-# Zastępowanie XNA losowymi wartościami
+# Zastępowanie 'XNA' losowymi wartościami
 set.seed(123)
-data_cleaned2$NAME_YIELD_GROUP[is.na(data_cleaned$NAME_YIELD_GROUPE)] <- sample(
+data_cleaned2$NAME_YIELD_GROUP[data_cleaned2$NAME_YIELD_GROUP == "XNA"] <- sample(
   existing_values, 
-  sum(is.na(data_cleaned2$NAME_YIELD_GROUP)), 
+  sum(data_cleaned2$NAME_YIELD_GROUP == "XNA"), 
   replace = TRUE
 )
 
@@ -349,8 +344,7 @@ cat("Wszystkie wartości XNA w kolumnie NAME_YIELD_GROUP zostały zastąpione lo
 
 # Tworzenie unikalnej nazwy pliku
 timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-output_path <- paste0("C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned3", ".csv")
-
+output_path <- paste0("C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned3_", timestamp, ".csv")
 
 write.csv(data_cleaned2, output_path, row.names = FALSE)
 
@@ -359,11 +353,6 @@ cat(paste("Zaktualizowane dane zapisano do nowego pliku:", output_path, "\n"))
 # ********************************************************
 # 16. Aktualizacja README.md
 # ********************************************************
-
-# Funkcja do dopisywania zawartości do README.md
-append_to_readme <- function(content, path) {
-  write(content, file = path, append = TRUE)
-}
 
 # Dopisanie nowej sekcji do README.md
 new_content <- paste0("
@@ -382,12 +371,99 @@ Dane zapisano w nowym pliku: `", basename(output_path), "`.
 ---
 ")
 
-# Funkcja dopisująca do README.md
+# Dopisanie do README.md
 append_to_readme <- function(content, path) {
   write(content, file = path, append = TRUE)
 }
 
-# Wywołanie funkcji z nową treścią
 append_to_readme(new_content, readme_path)
 
 cat("Zmiany zostały dopisane do README.md.\n")
+
+
+
+# Ścieżka do istniejącego pliku README.md
+readme_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/README.md"
+
+# ********************************************************
+# 17 Dopisywanie nowych analiz do README.md
+# ********************************************************
+
+# Komunikat
+cat("Kontynuacja napraw braków w danych liczbowych i kategorycznych w 'previous_application_cleaned3_20241210_123023.csv'...\n")
+
+# Wczytywanie danych z pliku CSV
+cat("Wczytywanie danych z pliku CSV...\n")
+
+# Ścieżka do pliku
+input_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned3_20241210_123023.csv"
+
+
+data_cleaned3<- read.csv(input_path, stringsAsFactors = FALSE)
+
+
+
+
+# ********************************************************
+# 18. Naprawa braków w 'data_cleaned2' w kolumnie NAME_CASH_LOAN_PURPOSE
+# ********************************************************
+
+# Definiowanie nowych propozycji wartości
+new_proposals <- c("Investment", "Vacation", "Home Renovation", "Education", "Health Treatment", "Office Equipment")
+
+# Zastąpienie 'XNA' i 'XAP' nowymi wartościami
+set.seed(123)
+data_cleaned2$NAME_CASH_LOAN_PURPOSE[data_cleaned2$NAME_CASH_LOAN_PURPOSE %in% c("XNA", "XAP")] <- sample(
+  new_proposals, 
+  sum(data_cleaned2$NAME_CASH_LOAN_PURPOSE %in% c("XNA", "XAP")), 
+  replace = TRUE
+)
+
+cat("Wartości 'XNA' i 'XAP' w kolumnie NAME_CASH_LOAN_PURPOSE zostały zastąpione nowymi propozycjami.\n")
+
+# ********************************************************
+# 19. Zapisanie wyników po zmianach do nowego pliku
+# ********************************************************
+
+# Tworzenie unikalnej nazwy pliku
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+output_path <- paste0("C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned4_", timestamp, ".csv")
+
+write.csv(data_cleaned3, output_path, row.names = FALSE)
+
+cat(paste("Zaktualizowane dane zapisano do nowego pliku:", output_path, "\n"))
+
+# ********************************************************
+# 20. Aktualizacja README.md
+# ********************************************************
+
+# Dopisanie nowej sekcji do README.md
+new_content <- paste0("
+### 4.3. Aktualizacja po zmianach w NAME_CASH_LOAN_PURPOSE
+
+Wartości `XNA` i `XAP` w kolumnie `NAME_CASH_LOAN_PURPOSE` zostały zastąpione nowymi propozycjami:
+- Investment
+- Vacation
+- Home Renovation
+- Education
+- Health Treatment
+- Office Equipment
+
+Po naprawie, liczba braków w tej kolumnie wynosi 0.
+
+Dane zapisano w nowym pliku: `", basename(output_path), "`.
+
+---
+")
+
+# Dopisanie do README.md
+append_to_readme <- function(content, path) {
+  write(content, file = path, append = TRUE)
+}
+
+append_to_readme(new_content, readme_path)
+
+cat("Zmiany zostały dopisane do README.md.\n")
+
+
+
