@@ -111,7 +111,22 @@ Wartości `XNA` i `XAP` w kolumnie `NAME_CASH_LOAN_PURPOSE` zostały zastąpione
 
 Po naprawie, liczba braków w tej kolumnie wynosi 0.
 
-Dane zapisano w nowym pliku: `previous_application_cleaned4_20241210_124631.csv`.
+Dane zapisano w nowym pliku: `previous_application_cleaned4_20241210_130020.csv`.
+
+---
+
+
+### 4.4. Aktualizacja po zmianach w NAME_PAYMENT_TYPE
+
+Wartości `XNA` w kolumnie `NAME_PAYMENT_TYPE` zostały zastąpione nowymi propozycjami:
+- Cryptocurrency
+- Bonds
+- Mobile Payment
+- WBMoney
+
+Po naprawie, liczba braków w tej kolumnie wynosi 0.
+
+Dane zapisano w nowym pliku: `previous_application_cleaned5_20241210_131100.csv`.
 
 ---
 

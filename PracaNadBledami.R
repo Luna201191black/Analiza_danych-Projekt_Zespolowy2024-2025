@@ -466,4 +466,80 @@ append_to_readme(new_content, readme_path)
 cat("Zmiany zostały dopisane do README.md.\n")
 
 
+# Ścieżka do istniejącego pliku README.md
+readme_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/README.md"
+
+# ********************************************************
+# 21. Dopisywanie nowych analiz do README.md
+# ********************************************************
+
+# Komunikat
+cat("Kontynuacja napraw braków w danych liczbowych i kategorycznych w 'previous_application_cleaned4_20241210_130020.csv'...\n")
+
+# Wczytywanie danych z pliku CSV
+cat("Wczytywanie danych z pliku CSV...\n")
+
+# Ścieżka do pliku
+input_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned4_20241210_130020.csv"
+
+data_cleaned4 <- read.csv(input_path, stringsAsFactors = FALSE)
+
+# ********************************************************
+# 22. Naprawa braków w 'data_cleaned4' w kolumnie NAME_PAYMENT_TYPE
+# ********************************************************
+
+# Definiowanie nowych propozycji wartości
+new_payment_types <- c("Cryptocurrency", "Bonds", "Mobile Payment", "WBMoney")
+
+# Zastąpienie 'XNA' nowymi wartościami
+set.seed(123)
+data_cleaned4$NAME_PAYMENT_TYPE[data_cleaned4$NAME_PAYMENT_TYPE == "XNA"] <- sample(
+  new_payment_types, 
+  sum(data_cleaned4$NAME_PAYMENT_TYPE == "XNA"), 
+  replace = TRUE
+)
+
+cat("Wartości 'XNA' w kolumnie NAME_PAYMENT_TYPE zostały zastąpione nowymi propozycjami.\n")
+
+# ********************************************************
+# 23. Zapisanie wyników po zmianach do nowego pliku
+# ********************************************************
+
+# Tworzenie unikalnej nazwy pliku
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+output_path <- paste0("C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned5_", timestamp, ".csv")
+
+write.csv(data_cleaned4, output_path, row.names = FALSE)
+
+cat(paste("Zaktualizowane dane zapisano do nowego pliku:", output_path, "\n"))
+
+# ********************************************************
+# 24. Aktualizacja README.md
+# ********************************************************
+
+# Dopisanie nowej sekcji do README.md
+new_content <- paste0("
+### 4.4. Aktualizacja po zmianach w NAME_PAYMENT_TYPE
+
+Wartości `XNA` w kolumnie `NAME_PAYMENT_TYPE` zostały zastąpione nowymi propozycjami:
+- Cryptocurrency
+- Bonds
+- Mobile Payment
+- WBMoney
+
+Po naprawie, liczba braków w tej kolumnie wynosi 0.
+
+Dane zapisano w nowym pliku: `", basename(output_path), "`.
+
+---
+")
+
+# Dopisanie do README.md
+append_to_readme <- function(content, path) {
+  write(content, file = path, append = TRUE)
+}
+
+append_to_readme(new_content, readme_path)
+
+cat("Zmiany zostały dopisane do README.md.\n")
 
