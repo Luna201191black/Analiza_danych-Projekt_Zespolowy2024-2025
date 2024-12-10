@@ -630,3 +630,83 @@ append_to_readme <- function(content, path) {
 append_to_readme(new_content, readme_path)
 
 cat("Zmiany zostały dopisane do README.md.\n")
+
+
+
+# Ścieżka do istniejącego pliku README.md
+readme_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/README.md"
+
+# ********************************************************
+# 29. Dopisywanie nowych analiz do README.md
+# ********************************************************
+
+# Komunikat
+cat("Kontynuacja napraw braków w danych liczbowych i kategorycznych w 'previous_application_cleaned6_20241210_132916.csv'...\n")
+
+# Wczytywanie danych z pliku CSV
+cat("Wczytywanie danych z pliku CSV...\n")
+
+# Ścieżka do pliku
+input_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned6_20241210_132916.csv"
+
+data_cleaned6 <- read.csv(input_path, stringsAsFactors = FALSE)
+
+# ********************************************************
+# 30 Naprawa braków w 'data_cleaned6' w kolumnie NAME_GOODS_CATEGORY
+# ********************************************************
+
+# Lista istniejących wartości bez 'XNA'
+existing_categories <- unique(data_cleaned6$NAME_GOODS_CATEGORY[data_cleaned6$NAME_GOODS_CATEGORY != "XNA"])
+
+# Zastąpienie 'XNA' losowymi wartościami z istniejących kategorii
+set.seed(123)
+data_cleaned6$NAME_GOODS_CATEGORY[data_cleaned6$NAME_GOODS_CATEGORY == "XNA"] <- sample(
+  existing_categories, 
+  sum(data_cleaned6$NAME_GOODS_CATEGORY == "XNA"), 
+  replace = TRUE
+)
+
+cat("Wartości 'XNA' w kolumnie NAME_GOODS_CATEGORY zostały zastąpione losowymi wartościami z istniejącej listy.\n")
+
+
+# ********************************************************
+# 31. Zapisanie wyników po zmianach do nowego pliku
+# ********************************************************
+
+# Tworzenie unikalnej nazwy pliku
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+output_path <- paste0("C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned7_", timestamp, ".csv")
+
+# Zapisanie zaktualizowanego pliku
+write.csv(data_cleaned6, output_path, row.names = FALSE)
+
+cat(paste("Zaktualizowane dane zapisano do nowego pliku:", output_path, "\n"))
+
+# ********************************************************
+# 32. Aktualizacja README.md
+# ********************************************************
+
+# Dopisanie nowej sekcji do README.md
+new_content <- paste0("
+### 4.6. Aktualizacja po zmianach w NAME_GOODS_CATEGORY
+
+Wartości `XNA` w kolumnie `NAME_GOODS_CATEGORY` zostały zastąpione losowymi wartościami z istniejących danych.
+
+Po naprawie, liczba braków w tej kolumnie wynosi 0.
+
+Dane zapisano w nowym pliku: `", basename(output_path), "`.
+
+---
+")
+
+# Funkcja dopisująca nową sekcję do README.md
+append_to_readme <- function(content, path) {
+  write(content, file = path, append = TRUE)
+}
+
+# Aktualizacja README.md
+append_to_readme(new_content, readme_path)
+
+cat("Zmiany zostały dopisane do README.md.\n")
+
+

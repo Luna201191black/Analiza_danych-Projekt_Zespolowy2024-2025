@@ -155,3 +155,14 @@ Dane zapisano w nowym pliku: `previous_application_cleaned6_20241210_132916.csv`
 
 ---
 
+
+### 4.6. Aktualizacja po zmianach w NAME_GOODS_CATEGORY
+
+Wartości `XNA` w kolumnie `NAME_GOODS_CATEGORY` zostały zastąpione losowymi wartościami z istniejących danych.
+
+Po naprawie, liczba braków w tej kolumnie wynosi 0.
+
+Dane zapisano w nowym pliku: `previous_application_cleaned7_20241210_134237.csv`.
+
+---
+
