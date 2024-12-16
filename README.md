@@ -231,3 +231,16 @@ Dane zapisano w nowym pliku: `previous_application_cleaned11_20241216_081422.csv
 
 ---
 
+
+
+### 4.11. Aktualizacja po zmianach w DAYS_TERMINATION
+
+W kolumnie `DAYS_TERMINATION` przeprowadzono następujące poprawki:
+- Wartości brakujące oraz `365243` zostały zastąpione losowymi wartościami z przedziału od `1` do `10950`.
+- Wartości ujemne zostały zastąpione losowymi wartościami.
+- Ekstremalnie wysokie wartości zostały ograniczone do maksymalnej liczby dni: `10950`.
+
+Dane zapisano w nowym pliku: `previous_application_cleaned12_20241216_090807.csv`.
+
+---
+

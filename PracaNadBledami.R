@@ -1031,3 +1031,82 @@ cat("Zmiany zostały dopisane do README.md.\n")
 
 
 
+# Ścieżka do pliku README.md
+readme_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/README.md"
+
+cat("Kontynuacja napraw braków w danych liczbowych i kategorycznych w 'previous_application_cleaned11'...\n")
+
+# ********************************************************
+# 51. Wczytywanie danych
+# ********************************************************
+input_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned11_20241216_081422.csv"
+
+
+# ********************************************************
+# 52. Naprawa kolumny DAYS_TERMINATION
+# ********************************************************
+cat("Przykładowe wartości DAYS_TERMINATION przed konwersją:\n")
+print(head(data_cleaned11$DAYS_TERMINATION))
+
+# Sprawdzamy,że kolumna jest numeryczna
+data_cleaned11$DAYS_TERMINATION <- as.numeric(data_cleaned11$DAYS_TERMINATION)
+
+# Zamiana 365243 oraz wartości ujemnych na NA
+data_cleaned11 <- data_cleaned11 %>%
+  mutate(DAYS_TERMINATION = ifelse(DAYS_TERMINATION == 365243 | DAYS_TERMINATION < 0, NA, DAYS_TERMINATION))
+
+cat("Przykładowe wartości DAYS_TERMINATION po zamianie na NA:\n")
+print(head(data_cleaned11$DAYS_TERMINATION))
+
+# Definiowanie maksymalnej wartości
+max_days <- 10950
+
+# Generowanie losowych wartości dla braków
+set.seed(123)
+
+data_cleaned11 <- data_cleaned11 %>%
+  mutate(
+    DAYS_TERMINATION = ifelse(
+      is.na(DAYS_TERMINATION), 
+      sample(1:max_days, sum(is.na(DAYS_TERMINATION)), replace = TRUE),
+      DAYS_TERMINATION
+    ),
+    DAYS_TERMINATION = pmin(DAYS_TERMINATION, max_days) 
+  )
+
+cat("Wartości w kolumnie DAYS_TERMINATION zostały poprawione.\n")
+cat("Podsumowanie DAYS_TERMINATION:\n")
+print(summary(data_cleaned11$DAYS_TERMINATION))
+
+# ********************************************************
+# 53. Zapisanie wyników do nowego pliku
+# ********************************************************
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+output_path <- paste0("C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned12_", timestamp, ".csv")
+
+write.csv(data_cleaned11, output_path, row.names = FALSE)
+cat(paste("Zaktualizowane dane zapisano do nowego pliku:", output_path, "\n"))
+
+# ********************************************************
+# 54. Aktualizacja README.md
+# ********************************************************
+new_content <- paste0("
+### 4.11. Aktualizacja po zmianach w DAYS_TERMINATION
+
+W kolumnie `DAYS_TERMINATION` przeprowadzono następujące poprawki:
+- Wartości brakujące oraz `365243` zostały zastąpione losowymi wartościami z przedziału od `1` do `", max_days, "`.
+- Wartości ujemne zostały zastąpione losowymi wartościami.
+- Ekstremalnie wysokie wartości zostały ograniczone do maksymalnej liczby dni: `", max_days, "`.
+
+Dane zapisano w nowym pliku: `", basename(output_path), "`.
+
+---
+")
+
+# Dopisywanie zmian do README.md
+append_to_readme <- function(content, path) {
+  write(content, file = path, append = TRUE, sep = "\n")
+}
+
+append_to_readme(new_content, readme_path)
+cat("Zmiany zostały dopisane do README.md.\n")
