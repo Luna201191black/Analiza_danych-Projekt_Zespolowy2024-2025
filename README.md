@@ -244,3 +244,30 @@ Dane zapisano w nowym pliku: `previous_application_cleaned12_20241216_090807.csv
 
 ---
 
+
+
+### 4.12. Aktualizacja po zmianach w kolumnach DAYS_TERMINATION i pozostałych
+
+W kolumnach `DAY_LAST_DUO`, `DAY_LAST_DUO version 1`, `day first duo`, `days first drawing`, `days decision` przeprowadzono następujące poprawki:
+- Wartości brakujące oraz `365243` zostały zastąpione losowymi wartościami z przedziału od `1` do `10950`.
+- Wartości ujemne zostały zastąpione losowymi wartościami.
+- Ekstremalnie wysokie wartości zostały ograniczone do maksymalnej liczby dni: `10950`.
+
+Dane zapisano w nowym pliku: `previous_application_cleaned13_20241216_094213.csv`.
+
+---
+
+
+
+### 4.13. Aktualizacja po zmianach w DAYS_LAST_DUE i DAYS_TERMINATION
+
+W kolumnie `DAYS_LAST_DUE` przeprowadzono następujące poprawki:
+- Wartości brakujące oraz `365243` zostały zastąpione losowymi wartościami z przedziału od `1` do `10950`.
+- Wartości ujemne zostały zastąpione losowymi wartościami.
+- Gdy wartości `DAYS_LAST_DUE` były większe lub równe `DAYS_TERMINATION`, zmniejszono `DAYS_LAST_DUE` o losową liczbę dni (1-150).
+- Wszystkie wartości `DAYS_LAST_DUE` zostały ograniczone, aby nie przekraczały `DAYS_TERMINATION`.
+
+Dane zapisano w nowym pliku: `previous_application_cleaned13_20241216_101139.csv`.
+
+---
+

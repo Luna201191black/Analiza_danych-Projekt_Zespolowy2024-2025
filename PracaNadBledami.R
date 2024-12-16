@@ -1110,3 +1110,113 @@ append_to_readme <- function(content, path) {
 
 append_to_readme(new_content, readme_path)
 cat("Zmiany zostały dopisane do README.md.\n")
+
+
+# ********************************************************
+# Ścieżka do pliku README.md
+# ********************************************************
+readme_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/README.md"
+
+cat("Kontynuacja napraw braków w danych liczbowych i kategorycznych w 'previous_application_cleaned12'...\n")
+
+# ********************************************************
+# 55. Wczytywanie danych
+# ********************************************************
+input_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned12_20241216_090807.csv"
+
+# ********************************************************
+# 56. Naprawa kolumny DAYS_LAST_DUE
+# ********************************************************
+cat("Przykładowe wartości DAYS_LAST_DUE przed konwersją:\n")
+print(head(data_cleaned12$DAYS_LAST_DUE))
+
+# Sprawdzamy, że kolumna jest numeryczna
+data_cleaned12$DAYS_LAST_DUE <- as.numeric(data_cleaned12$DAYS_LAST_DUE)
+
+# Zamiana 365243 oraz wartości ujemnych na NA
+data_cleaned12 <- data_cleaned12 %>%
+  mutate(DAYS_LAST_DUE = ifelse(DAYS_LAST_DUE == 365243 | DAYS_LAST_DUE < 0, NA, DAYS_LAST_DUE))
+
+cat("Przykładowe wartości DAYS_LAST_DUE po zamianie na NA:\n")
+print(head(data_cleaned12$DAYS_LAST_DUE))
+
+# Definiowanie maksymalnej wartości
+max_days <- 10950
+set.seed(123)
+
+data_cleaned12 <- data_cleaned12 %>%
+  mutate(
+    DAYS_LAST_DUE = ifelse(
+      is.na(DAYS_LAST_DUE), 
+      sample(1:max_days, sum(is.na(DAYS_LAST_DUE)), replace = TRUE),
+      DAYS_LAST_DUE
+    ),
+    DAYS_LAST_DUE = pmin(DAYS_LAST_DUE, max_days)
+  )
+
+cat("Wartości w kolumnie DAYS_LAST_DUE zostały poprawione.\n")
+cat("Podsumowanie DAYS_LAST_DUE:\n")
+print(summary(data_cleaned12$DAYS_LAST_DUE))
+
+# ********************************************************
+# 57. Logiczna relacja między DAYS_LAST_DUE a DAYS_TERMINATION
+# ********************************************************
+set.seed(123)
+
+data_cleaned12 <- data_cleaned12 %>%
+  mutate(
+    # Tworzenie losowej różnicy między 1 a 30 dni
+    random_diff = sample(1:150, n(), replace = TRUE),
+    
+    # Modyfikacja DAYS_LAST_DUE, aby była mniejsza od DAYS_TERMINATION
+    DAYS_LAST_DUE = ifelse(
+      DAYS_LAST_DUE >= DAYS_TERMINATION,
+      pmax(DAYS_TERMINATION - random_diff, 1),
+      DAYS_LAST_DUE
+    ),
+    
+    # Ograniczenie wartości DAYS_LAST_DUE, aby nie przekraczały DAYS_TERMINATION
+    DAYS_LAST_DUE = pmin(DAYS_LAST_DUE, DAYS_TERMINATION)
+  ) %>%
+  select(-random_diff)
+
+cat("Podsumowanie DAYS_LAST_DUE po poprawkach relacji:\n")
+print(summary(data_cleaned12$DAYS_LAST_DUE))
+
+# Weryfikacja logicznej relacji
+cat("Sprawdzenie relacji między kolumnami DAYS_LAST_DUE i DAYS_TERMINATION:\n")
+all(data_cleaned12$DAYS_LAST_DUE <= data_cleaned12$DAYS_TERMINATION)
+
+# ********************************************************
+# 58. Zapisanie wyników do nowego pliku
+# ********************************************************
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+output_path <- paste0("C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned13_", timestamp, ".csv")
+
+write.csv(data_cleaned12, output_path, row.names = FALSE)
+cat(paste("Zaktualizowane dane zapisano do nowego pliku:", output_path, "\n"))
+
+# ********************************************************
+# 59. Aktualizacja README.md
+# ********************************************************
+new_content <- paste0("
+### 4.13. Aktualizacja po zmianach w DAYS_LAST_DUE i DAYS_TERMINATION
+
+W kolumnie `DAYS_LAST_DUE` przeprowadzono następujące poprawki:
+- Wartości brakujące oraz `365243` zostały zastąpione losowymi wartościami z przedziału od `1` do `", max_days, "`.
+- Wartości ujemne zostały zastąpione losowymi wartościami.
+- Gdy wartości `DAYS_LAST_DUE` były większe lub równe `DAYS_TERMINATION`, zmniejszono `DAYS_LAST_DUE` o losową liczbę dni (1-150).
+- Wszystkie wartości `DAYS_LAST_DUE` zostały ograniczone, aby nie przekraczały `DAYS_TERMINATION`.
+
+Dane zapisano w nowym pliku: `", basename(output_path), "`.
+
+---
+")
+
+# Dopisywanie zmian do README.md
+append_to_readme <- function(content, path) {
+  write(content, file = path, append = TRUE, sep = "\n")
+}
+
+append_to_readme(new_content, readme_path)
+cat("Zmiany zostały dopisane do README.md.\n")
