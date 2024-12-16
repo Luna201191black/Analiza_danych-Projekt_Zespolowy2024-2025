@@ -210,3 +210,23 @@ Dane zapisano w nowym pliku: `previous_application_cleaned10_20241216_074732.csv
 
 ---
 
+
+### 4.10. Aktualizacja po zmianach w NAME_SELLER_INDUSTRY
+
+Wartości `XNA` w kolumnie `NAME_SELLER_INDUSTRY` zostały zastąpione losowymi wartościami z istniejących oraz nowych kategorii:
+-Services
+-Manufacturing
+-E-commerce
+-Automotive
+-Healthcare
+-Agriculture
+-Construction
+-Technology
+
+
+Po naprawie, liczba braków w tej kolumnie wynosi 0.
+
+Dane zapisano w nowym pliku: `previous_application_cleaned11_20241216_080145.csv`.
+
+---
+

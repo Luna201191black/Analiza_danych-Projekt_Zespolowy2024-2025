@@ -910,7 +910,7 @@ write.csv(data_cleaned9, output_path, row.names = FALSE)
 cat(paste("Zaktualizowane dane zapisano do nowego pliku:", output_path, "\n"))
 
 # ********************************************************
-# 43. Aktualizacja README.md
+# 45. Aktualizacja README.md
 # ********************************************************
 
 # Dopisanie nowej sekcji do README.md
@@ -936,6 +936,98 @@ append_to_readme(new_content, readme_path)
 cat("Zmiany zostały dopisane do README.md.\n")
 
 
+# Ścieżka do istniejącego pliku README.md
+readme_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/README.md"
+
+# ********************************************************
+# 46. Dopisywanie nowych analiz do README.md
+# ********************************************************
+
+# Komunikat
+cat("Kontynuacja napraw braków w danych liczbowych i kategorycznych w 'previous_application_cleaned10_20241216_074732'...\n")
+
+# Wczytywanie danych z pliku CSV
+cat("Wczytywanie danych z pliku CSV...\n")
+
+# Ścieżka do pliku
+input_path <-"C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned10_20241216_074732.csv"
+
+data_cleaned10 <- read.csv(input_path, stringsAsFactors = FALSE)
+
+
+
+
+# ********************************************************
+# 47. Naprawa braków w 'data_cleaned8' w kolumnie NAME_SELLER_INDUSTRY
+# ********************************************************
+
+# Lista istniejących wartości w kolumnie 'NAME_SELLER_INDUSTRY' (bez 'XNA')
+existing_seller_industries <- unique(data_cleaned10$NAME_SELLER_INDUSTRY[data_cleaned10$NAME_SELLER_INDUSTRY != "XNA"])
+
+# Lista nowych wartości
+new_seller_industries <- c("E-commerce", "Services", "Manufacturing", 
+                           "Technology", "Automotive", "Healthcare", 
+                           "Agriculture", "Construction" )
+
+# Połączenie istniejących kategorii z nowymi
+seller_industry_pool <- c(existing_seller_industries, new_seller_industries)
+
+# Zastąpienie 'XNA' losowymi wartościami z pełnej listy kategorii
+set.seed(123)
+data_cleaned8$NAME_SELLER_INDUSTRY[data_cleaned10$NAME_SELLER_INDUSTRY == "XNA"] <- sample(
+  seller_industry_pool,
+  sum(data_cleaned10$NAME_SELLER_INDUSTRY == "XNA"),
+  replace = TRUE
+)
+
+cat("Wartości 'XNA' w kolumnie NAME_SELLER_INDUSTRY zostały zastąpione losowymi wartościami z pełnej listy kategorii.\n")
+
+# ********************************************************
+# 48. Zapisanie wyników po zmianach do nowego pliku
+# ********************************************************
+
+# Tworzenie unikalnej nazwy pliku
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+output_path <- paste0("C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned11_", timestamp, ".csv")
+
+write.csv(data_cleaned10, output_path, row.names = FALSE)
+
+cat(paste("Zaktualizowane dane zapisano do nowego pliku:", output_path, "\n"))
+
+# ********************************************************
+# 49. Aktualizacja README.md
+# ********************************************************
+
+# Dopisanie nowej sekcji do README.md
+new_content <- paste0("
+### 4.10. Aktualizacja po zmianach w NAME_SELLER_INDUSTRY
+
+Wartości `XNA` w kolumnie `NAME_SELLER_INDUSTRY` zostały zastąpione losowymi wartościami z istniejących oraz nowych kategorii:
+-Services
+-Manufacturing
+-E-commerce
+-Automotive
+-Healthcare
+-Agriculture
+-Construction
+-Technology
+
+
+Po naprawie, liczba braków w tej kolumnie wynosi 0.
+
+Dane zapisano w nowym pliku: `", basename(output_path), "`.
+
+---
+")
+
+# Funkcja dopisująca do README.md
+append_to_readme <- function(content, path) {
+  write(content, file = path, append = TRUE)
+}
+
+append_to_readme(new_content, readme_path)
+
+cat("Zmiany zostały dopisane do README.md.\n")
 
 
 
