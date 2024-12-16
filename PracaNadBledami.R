@@ -958,7 +958,7 @@ data_cleaned10 <- read.csv(input_path, stringsAsFactors = FALSE)
 
 
 # ********************************************************
-# 47. Naprawa braków w 'data_cleaned8' w kolumnie NAME_SELLER_INDUSTRY
+# 47. Naprawa braków w 'data_cleaned10' w kolumnie NAME_SELLER_INDUSTRY
 # ********************************************************
 
 # Lista istniejących wartości w kolumnie 'NAME_SELLER_INDUSTRY' (bez 'XNA')
@@ -974,7 +974,7 @@ seller_industry_pool <- c(existing_seller_industries, new_seller_industries)
 
 # Zastąpienie 'XNA' losowymi wartościami z pełnej listy kategorii
 set.seed(123)
-data_cleaned8$NAME_SELLER_INDUSTRY[data_cleaned10$NAME_SELLER_INDUSTRY == "XNA"] <- sample(
+data_cleaned10$NAME_SELLER_INDUSTRY[data_cleaned10$NAME_SELLER_INDUSTRY == "XNA"] <- sample(
   seller_industry_pool,
   sum(data_cleaned10$NAME_SELLER_INDUSTRY == "XNA"),
   replace = TRUE
