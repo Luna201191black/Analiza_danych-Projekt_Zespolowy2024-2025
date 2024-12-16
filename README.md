@@ -199,3 +199,14 @@ Dane zapisano w nowym pliku: `previous_application_cleaned9_20241216_072521.csv`
 
 ---
 
+
+### 4.9. Aktualizacja po zmianach w SELLERPLACE_AREA
+
+Wartości <= 0 w kolumnie `SELLERPLACE_AREA` zostały zastąpione losowymi istniejącymi wartościami, aby poprawić dane.
+
+Po naprawie, liczba braków i nieprawidłowych wartości w tej kolumnie wynosi 0.
+
+Dane zapisano w nowym pliku: `previous_application_cleaned10_20241216_074732.csv`.
+
+---
+

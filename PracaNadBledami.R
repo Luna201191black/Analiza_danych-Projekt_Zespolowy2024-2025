@@ -793,24 +793,7 @@ cat("Zmiany zostały dopisane do README.md.\n")
 
 
 
-# Ścieżka do istniejącego pliku README.md
-readme_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/README.md"
-
-# ********************************************************
-# 37. Dopisywanie nowych analiz do README.md
-# ********************************************************
-
-# Komunikat
-cat("Kontynuacja napraw braków w danych liczbowych i kategorycznych w 'previous_application_cleaned8_20241210_140142'...\n")
-
-# Wczytywanie danych z pliku CSV
-cat("Wczytywanie danych z pliku CSV...\n")
-
-# Ścieżka do pliku
-input_path <-"C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned8_20241210_140142.csv"
-
-data_cleaned8 <- read.csv(input_path, stringsAsFactors = FALSE)
-
+ 
 # ********************************************************
 # 38. Naprawa braków w 'data_cleaned8' w kolumnie NAME_PRODUCT_TYPE
 # ********************************************************
@@ -875,6 +858,83 @@ append_to_readme <- function(content, path) {
 append_to_readme(new_content, readme_path)
 
 cat("Zmiany zostały dopisane do README.md.\n")
+
+
+# Ścieżka do istniejącego pliku README.md
+readme_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/README.md"
+
+# ********************************************************
+# 42. Dopisywanie nowych analiz do README.md
+# ********************************************************
+
+# Komunikat
+cat("Kontynuacja napraw braków w danych liczbowych i kategorycznych w 'previous_application_cleaned9_20241216_072521'...\n")
+
+# Wczytywanie danych z pliku CSV
+cat("Wczytywanie danych z pliku CSV...\n")
+
+# Ścieżka do pliku
+input_path <-"C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned9_20241216_072521.csv"
+
+data_cleaned9 <- read.csv(input_path, stringsAsFactors = FALSE)
+
+
+
+# ********************************************************
+# 43. Naprawa braków w 'data_cleaned9' w kolumnie SELLERPLACE_AREA
+# ********************************************************
+
+# Lista istniejących wartości w kolumnie 'SELLERPLACE_AREA' (bez wartości <= 0)
+existing_sellerplace_areas <- unique(data_cleaned9$SELLERPLACE_AREA[data_cleaned9$SELLERPLACE_AREA > 0])
+
+# Zastąpienie wartości <= 0 losowymi istniejącymi wartościami
+set.seed(123)
+data_cleaned9$SELLERPLACE_AREA[data_cleaned9$SELLERPLACE_AREA <= 0] <- sample(
+  existing_sellerplace_areas,
+  sum(data_cleaned9$SELLERPLACE_AREA <= 0),
+  replace = TRUE
+)
+
+cat("Wartości <= 0 w kolumnie SELLERPLACE_AREA zostały zastąpione losowymi istniejącymi wartościami.\n")
+
+# ********************************************************
+# 44. Zapisanie wyników po zmianach do nowego pliku
+# ********************************************************
+
+# Tworzenie unikalnej nazwy pliku
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+output_path <- paste0("C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned10_", timestamp, ".csv")
+
+write.csv(data_cleaned9, output_path, row.names = FALSE)
+
+cat(paste("Zaktualizowane dane zapisano do nowego pliku:", output_path, "\n"))
+
+# ********************************************************
+# 43. Aktualizacja README.md
+# ********************************************************
+
+# Dopisanie nowej sekcji do README.md
+new_content <- paste0("
+### 4.9. Aktualizacja po zmianach w SELLERPLACE_AREA
+
+Wartości <= 0 w kolumnie `SELLERPLACE_AREA` zostały zastąpione losowymi istniejącymi wartościami, aby poprawić dane.
+
+Po naprawie, liczba braków i nieprawidłowych wartości w tej kolumnie wynosi 0.
+
+Dane zapisano w nowym pliku: `", basename(output_path), "`.
+
+---
+")
+
+# Funkcja dopisująca do README.md
+append_to_readme <- function(content, path) {
+  write(content, file = path, append = TRUE)
+}
+
+append_to_readme(new_content, readme_path)
+
+cat("Zmiany zostały dopisane do README.md.\n")
+
 
 
 
