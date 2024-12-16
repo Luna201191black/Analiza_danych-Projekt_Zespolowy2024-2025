@@ -793,3 +793,89 @@ cat("Zmiany zostały dopisane do README.md.\n")
 
 
 
+# Ścieżka do istniejącego pliku README.md
+readme_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/README.md"
+
+# ********************************************************
+# 37. Dopisywanie nowych analiz do README.md
+# ********************************************************
+
+# Komunikat
+cat("Kontynuacja napraw braków w danych liczbowych i kategorycznych w 'previous_application_cleaned8_20241210_140142'...\n")
+
+# Wczytywanie danych z pliku CSV
+cat("Wczytywanie danych z pliku CSV...\n")
+
+# Ścieżka do pliku
+input_path <-"C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned8_20241210_140142.csv"
+
+data_cleaned8 <- read.csv(input_path, stringsAsFactors = FALSE)
+
+# ********************************************************
+# 38. Naprawa braków w 'data_cleaned8' w kolumnie NAME_PRODUCT_TYPE
+# ********************************************************
+
+# Lista istniejących wartości w kolumnie 'NAME_PRODUCT_TYPE' bez 'XNA'
+existing_product_types <- unique(data_cleaned8$NAME_PRODUCT_TYPE[data_cleaned8$NAME_PRODUCT_TYPE != "XNA"])
+
+# Lista nowych wartości, które chcesz dodać
+new_product_types <- c("Personal ", "Mortgage", "Business", "Education")
+
+# Połączenie istniejących kategorii (bez 'XNA') z nowymi
+product_types_pool <- c(existing_product_types, new_product_types)
+
+# Zastąpienie 'XNA' losowymi wartościami z pełnej listy kategorii
+set.seed(123)
+data_cleaned8$NAME_PRODUCT_TYPE[data_cleaned8$NAME_PRODUCT_TYPE == "XNA"] <- sample(
+  product_types_pool,
+  sum(data_cleaned7$NAME_PRODUCT_TYPE == "XNA"),
+  replace = TRUE
+)
+
+cat("Wartości 'XNA' w kolumnie NAME_PRODUCT_TYPE zostały zastąpione losowymi wartościami z pełnej listy typów produktów, w tym nowych.\n")
+
+# ********************************************************
+# 39. Zapisanie wyników po zmianach do nowego pliku
+# ********************************************************
+
+# Tworzenie unikalnej nazwy pliku
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+output_path <- paste0("C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned9_", timestamp, ".csv")
+
+write.csv(data_cleaned8, output_path, row.names = FALSE)
+
+cat(paste("Zaktualizowane dane zapisano do nowego pliku:", output_path, "\n"))
+
+# ********************************************************
+# 40. Aktualizacja README.md
+# ********************************************************
+
+# Dopisanie nowej sekcji do README.md
+new_content <- paste0("
+### 4.8. Aktualizacja po zmianach w NAME_PRODUCT_TYPE
+
+Wartości `XNA` w kolumnie `NAME_PRODUCT_TYPE` zostały zastąpione losowymi wartościami z istniejących oraz nowych typów produktów:
+- Personal 
+- Mortgage
+- Business 
+- Education
+
+Po naprawie, liczba braków w tej kolumnie wynosi 0.
+
+Dane zapisano w nowym pliku: `", basename(output_path), "`.
+
+---
+")
+
+# Funkcja dopisująca do README.md
+append_to_readme <- function(content, path) {
+  write(content, file = path, append = TRUE)
+}
+
+append_to_readme(new_content, readme_path)
+
+cat("Zmiany zostały dopisane do README.md.\n")
+
+
+
+

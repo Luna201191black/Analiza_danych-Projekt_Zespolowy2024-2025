@@ -184,3 +184,18 @@ Dane zapisano w nowym pliku: `previous_application_cleaned8_20241210_140142.csv`
 
 ---
 
+
+### 4.8. Aktualizacja po zmianach w NAME_PRODUCT_TYPE
+
+Wartości `XNA` w kolumnie `NAME_PRODUCT_TYPE` zostały zastąpione losowymi wartościami z istniejących oraz nowych typów produktów:
+- Personal 
+- Mortgage
+- Business 
+- Education
+
+Po naprawie, liczba braków w tej kolumnie wynosi 0.
+
+Dane zapisano w nowym pliku: `previous_application_cleaned9_20241216_072521.csv`.
+
+---
+
