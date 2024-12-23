@@ -1200,7 +1200,7 @@ cat(paste("Zaktualizowane dane zapisano do nowego pliku:", output_path, "\n"))
 # 59. Aktualizacja README.md
 # ********************************************************
 new_content <- paste0("
-### 4.13. Aktualizacja po zmianach w DAYS_LAST_DUE i DAYS_TERMINATION
+### 4.12. Aktualizacja po zmianach w DAYS_LAST_DUE i DAYS_TERMINATION
 
 W kolumnie `DAYS_LAST_DUE` przeprowadzono następujące poprawki:
 - Wartości brakujące oraz `365243` zostały zastąpione losowymi wartościami z przedziału od `1` do `", max_days, "`.
@@ -1220,3 +1220,504 @@ append_to_readme <- function(content, path) {
 
 append_to_readme(new_content, readme_path)
 cat("Zmiany zostały dopisane do README.md.\n")
+
+
+
+# ********************************************************
+# Ścieżka do pliku README.md
+# ********************************************************
+readme_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/README.md"
+
+cat("Rozpoczynanie przetwarzania danych i aktualizacji README.md...\n")
+
+# ********************************************************
+# 60. Wczytywanie danych
+# ********************************************************
+input_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned14_20241216_110014.csv"
+data_cleaned13 <- read.csv(input_path)
+
+# ********************************************************
+# 61. Poprawiamy kolumna: RATE_DOWN_PAYMENT
+# ********************************************************
+cat("Na razie sprobujemy przekształcać kolumnę RATE_DOWN_PAYMENT na wartości procentowe oraz ustawiamy limit 20% dla wpłacania środków osobistych...\n")
+install.packages("dplyr")
+library(dplyr)
+
+
+
+data_cleaned13 <- data_cleaned13 %>%
+  mutate(RATE_DOWN_PAYMENT = round(pmin(RATE_DOWN_PAYMENT, 0.2) * 100,2))
+
+cat("Robimy podsumowanie kolumny RATE_DOWN_PAYMENT:\n")
+print(summary(data_cleaned13$RATE_DOWN_PAYMENT))
+
+# ********************************************************
+# 62. Poprawiamy kolumne AMT_ANNUITY
+# ********************************************************
+cat("Sprobujemy zrobić uzupełnienie  brakujących wartości w kolumnie AMT_ANNUITY medianą...\n")
+data_cleaned13 <- data_cleaned13 %>%
+  mutate(AMT_ANNUITY = round(ifelse(is.na(AMT_ANNUITY), median(AMT_ANNUITY, na.rm = TRUE), AMT_ANNUITY),2))
+
+cat("Podsumowanie AMT_ANNUITY:\n")
+print(summary(data_cleaned13$AMT_ANNUITY))
+
+
+# ********************************************************
+# 63. Dodanie nowych zmiennych
+# ********************************************************
+
+cat("Dodawanie nowych zmiennych analitycznych...
+")
+data_cleaned13 <- data_cleaned13 %>%
+  mutate(
+    # Ustawienie minimalnej wartości dla AMT_CREDIT i AMT_ANNUITY na 2000
+    AMT_CREDIT = round(pmax(AMT_CREDIT, 2000), 2),
+    AMT_ANNUITY = round(pmax(AMT_ANNUITY, 2000), 2),
+    # Obliczanie zmiennych analitycznych
+    DOWN_PAYMENT_PERCENTAGE = round(pmin((AMT_DOWN_PAYMENT / AMT_CREDIT) * 100), 2),
+    CREDIT_TO_ANNUITY_RATIO = round(AMT_CREDIT / AMT_ANNUITY, 2),
+    GOODS_CREDIT_DIFFERENCE = round(AMT_GOODS_PRICE - AMT_CREDIT, 2),
+    CREDIT_PERCENTAGE = round(pmin((AMT_CREDIT / AMT_GOODS_PRICE) * 100, 100), 2)
+  ) %>%
+  mutate(
+    # Ograniczenie dużych różnic między ceną towaru a kredytem
+    AMT_CREDIT = round(ifelse(GOODS_CREDIT_DIFFERENCE > 50000, AMT_GOODS_PRICE, AMT_CREDIT), 2),
+    GOODS_CREDIT_DIFFERENCE = round(AMT_GOODS_PRICE - AMT_CREDIT, 2)
+  )
+
+
+cat("Podsumowanie nowych zmiennych:\n")
+print(summary(data_cleaned13[, c("DOWN_PAYMENT_PERCENTAGE", "CREDIT_TO_ANNUITY_RATIO", "GOODS_CREDIT_DIFFERENCE", "CREDIT_PERCENTAGE")]))
+
+
+
+# ********************************************************
+# 64. Usuwanie kolumny DAYS_LAST_DUE_1ST_VERSION  i DAYS_TERMINATION
+# ********************************************************
+
+data_cleaned13 <- data_cleaned13 %>%
+  select(-DAYS_LAST_DUE_1ST_VERSION,-DAYS_TERMINATION)
+
+
+
+# ********************************************************
+# 65 Naprawa relacji pomiędzy kolumnami związanami z dniami
+# ********************************************************
+
+cat("Naprawa relacji między kolumnami związanymi z dniami...\n")
+
+data_cleaned13 <- data_cleaned13 %>%
+  mutate(
+    # DAYS_DECISION: Wartości losowe dla braków lub <= 0
+    DAYS_DECISION = as.integer(ifelse(is.na(DAYS_DECISION) | DAYS_DECISION <= 0, sample(1:30, n(), replace = TRUE), DAYS_DECISION)),
+    
+    # DAYS_FIRST_DRAWING: Losowa wartość po DAYS_DECISION, ale ograniczona logicznie
+    DAYS_FIRST_DRAWING = as.integer(ifelse(is.na(DAYS_FIRST_DRAWING) | DAYS_FIRST_DRAWING <= 0, 
+                                           DAYS_DECISION + sample(1:30, n(), replace = TRUE), 
+                                           pmin(DAYS_DECISION + sample(1:30, n(), replace = TRUE), DAYS_FIRST_DUE))),
+    
+    # DAYS_FIRST_DUE: Po DAYS_FIRST_DRAWING
+    DAYS_FIRST_DUE = as.integer(ifelse(is.na(DAYS_FIRST_DUE) | DAYS_FIRST_DUE <= 0, 
+                                       DAYS_FIRST_DRAWING + sample(1:30, n(), replace = TRUE), 
+                                       DAYS_FIRST_DUE)),
+    
+    # DAYS_LAST_DUE: Po DAYS_FIRST_DUE
+    DAYS_LAST_DUE = as.integer(ifelse(is.na(DAYS_LAST_DUE) | DAYS_LAST_DUE <= 0, 
+                                      DAYS_FIRST_DUE + sample(30:365, n(), replace = TRUE), 
+                                      DAYS_LAST_DUE)),
+    
+    # Relacje logiczne
+    DAYS_FIRST_DRAWING = ifelse(DAYS_FIRST_DRAWING > DAYS_FIRST_DUE, DAYS_FIRST_DUE, DAYS_FIRST_DRAWING),
+    DAYS_FIRST_DUE = ifelse(DAYS_FIRST_DUE > DAYS_LAST_DUE, DAYS_LAST_DUE, DAYS_FIRST_DUE),
+    DAYS_DECISION = ifelse(DAYS_DECISION > DAYS_FIRST_DRAWING, DAYS_FIRST_DRAWING, DAYS_DECISION)
+  )
+
+cat("Relacje między kolumnami zostały poprawione. Podsumowanie:\n")
+print(summary(data_cleaned13[, c("DAYS_DECISION", "DAYS_FIRST_DRAWING", "DAYS_FIRST_DUE", "DAYS_LAST_DUE")]))
+
+
+# ********************************************************
+# 66. Poprawa kolumny AMT_ANNUITY
+# ********************************************************
+cat("Uzupełniamy brakujące wartości w kolumnie AMT_ANNUITY medianą...\n")
+data_cleaned13 <- data_cleaned13 %>%
+  mutate(AMT_ANNUITY = round(ifelse(is.na(AMT_ANNUITY), median(AMT_ANNUITY, na.rm = TRUE), AMT_ANNUITY), 2))
+
+cat("Podsumowanie AMT_ANNUITY:\n")
+print(summary(data_cleaned13$AMT_ANNUITY))
+
+
+
+
+# ********************************************************
+# 67. Poprawa kolumn AMT_APPLICATION i AMT_ANNUITY
+# ********************************************************
+cat("Poprawa kolumn AMT_APPLICATION i AMT_ANNUITY...\n")
+data_cleaned13 <- data_cleaned13 %>%
+  mutate(
+    AMT_APPLICATION = ifelse(is.na(AMT_APPLICATION) | AMT_APPLICATION <= 0,
+                             AMT_CREDIT + AMT_DOWN_PAYMENT, 
+                             AMT_APPLICATION),
+    AMT_APPLICATION = pmax(AMT_APPLICATION, AMT_CREDIT + AMT_DOWN_PAYMENT)
+  )
+
+
+avg_annuity_period <- 12  
+data_cleaned13 <- data_cleaned13 %>%
+  mutate(
+    AMT_ANNUITY = ifelse(is.na(AMT_ANNUITY) | AMT_ANNUITY <= 0,
+                         round(AMT_CREDIT / avg_annuity_period, 2),
+                         AMT_ANNUITY)
+  )
+
+cat("Podsumowanie AMT_APPLICATION i AMT_ANNUITY po poprawkach:\n")
+print(summary(data_cleaned13[, c("AMT_APPLICATION", "AMT_ANNUITY")]))
+
+
+
+# ********************************************************
+# 68. Usunięcie kolumny GOODS_CREDIT_DIFFERENCE, poniważ była potrzebna tylko do sptraw technicznych
+# ********************************************************
+
+data_cleaned13 <- data_cleaned13 %>%
+  select(-GOODS_CREDIT_DIFFERENCE)
+
+
+
+# ********************************************************
+# 69. Zmienimy nazwe kolumn na troche inne, żeby można było to zrozumieć oraz robic dalej analizę
+# ********************************************************
+cat("Zmiana nazw w kolumnach...\n")
+
+data_cleaned13 <- data_cleaned13 %>%
+  rename(id_poprzedniego_wniosku = SK_ID_PREV)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(id_klienta_banka = SK_ID_CURR)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(typ_umowy = NAME_CONTRACT_TYPE)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(roczna_rata = AMT_ANNUITY)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(wnioskowana_kwota = AMT_APPLICATION)
+
+
+install.packages("dplyr")
+library(dplyr)
+
+data_cleaned13 <- data_cleaned13 %>%
+  rename(kwota_kredytu = AMT_CREDIT)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(wklad_wlasny = AMT_DOWN_PAYMENT)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(cena_towaru = AMT_GOODS_PRICE)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(dzien_tygodnia_procesu = WEEKDAY_APPR_PROCESS_START)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(godzina_rozpoczecia_procesu = HOUR_APPR_PROCESS_START)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(ostatni_wniosek_w_umowie = FLAG_LAST_APPL_PER_CONTRACT)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(czy_ostatni_wniosek_tego_dnia = NFLAG_LAST_APPL_IN_DAY)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(procent_wkladu_wlasnego = RATE_DOWN_PAYMENT)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(cel_kredytu = NAME_CASH_LOAN_PURPOSE)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(stan_umowy = NAME_CONTRACT_STATUS)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(dzien_decyzji = DAYS_DECISION )
+data_cleaned13 <- data_cleaned13 %>%
+  rename(rodzaj_platnosci = NAME_PAYMENT_TYPE)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(przyczyna_odrzucenia = CODE_REJECT_REASON)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(stan_rodzinny = NAME_TYPE_SUITE)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(rodzaj_klienta = NAME_CLIENT_TYPE)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(typ_towaru = NAME_GOODS_CATEGORY)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(kategoria_portfela = NAME_PORTFOLIO)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(kategoria_produktu = NAME_PRODUCT_TYPE)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(typ_kanalu = CHANNEL_TYPE)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(lokalizacja_sprzedawcy = SELLERPLACE_AREA)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(typ_branzy = NAME_SELLER_INDUSTRY)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(liczba_rat = CNT_PAYMENT)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(kategoria_zwrotu = NAME_YIELD_GROUP)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(typ_kombinacji = PRODUCT_COMBINATION)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(dzien_pierwszej_wyplaty = DAYS_FIRST_DRAWING)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(dzien_pierwszej_raty = DAYS_FIRST_DUE)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(dzien_ostatniej_raty = DAYS_LAST_DUE)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(status_ubezpieczenia = NFLAG_INSURED_ON_APPROVAL)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(procent_wkladu_wlasny = DOWN_PAYMENT_PERCENTAGE)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(stosunek_kwoty_kredytu = CREDIT_TO_ANNUITY_RATIO)
+data_cleaned13 <- data_cleaned13 %>%
+  rename(procent_kredytu = CREDIT_PERCENTAGE)
+
+
+
+
+
+
+
+
+cat("Podsumowanie zmian w kolumnach:\n")
+print(names(data_cleaned13))
+
+# ********************************************************
+# 69.Zmiana wartości w kolumnie 'przyczyna_odrzucenia' na "nie dotyczy" tam, gdzie 'stan_umowy' jest inny niż "Refused"
+# ********************************************************
+
+
+data_cleaned13 <- data_cleaned13 %>%
+  mutate(przyczyna_odrzucenia = ifelse(stan_umowy != "Refused", "nie dotyczy", przyczyna_odrzucenia))
+
+head(data_cleaned13)
+
+
+
+data_cleaned13 <- data_cleaned13 %>%
+  select(-procent_wkladu_wlasnego)
+
+
+print(names(data_cleaned13))
+
+
+# ********************************************************
+# 70. Zerowanie wartości w określonych kolumnach dla odpowiednich wierszy
+# ********************************************************
+
+set.seed(123)
+
+
+kolumny_do_zerowania <- c("kwota_kredytu", "roczna_rata", "wklad_wlasny")
+data_cleaned13 <- data_cleaned13 %>%
+  mutate(
+    procent_kredytu = ifelse(
+      stan_umowy %in% c("Refused", "Canceled"), 
+      0, 
+      round(runif(n(), min = 2, max = 5), 2)  
+    ),
+   
+    across(all_of(kolumny_do_zerowania), ~ ifelse(stan_umowy %in% c("Refused", "Canceled"), 0, .))
+  )
+
+head(data_cleaned13)
+
+
+
+
+# ********************************************************
+# 71. Modyfikujemy kolumny,kwota wnioskowana musi być powiązana z ceną towaru lub usługą oraz z procentem wkładu własnego,, 
+# oraz wnioskowana kwota była więcej lub równa kwocie kredytu
+# ********************************************************
+
+
+data_cleaned13 <- data_cleaned13 %>%
+  mutate(
+    wklad_wlasny = ifelse(
+      stan_umowy %in% c("Refused", "Canceled"), 
+      0, 
+      round(procent_wkladu_wlasny * cena_towaru, 2)
+    ),
+    
+    
+    wnioskowana_kwota = ifelse(
+      stan_umowy %in% c("Refused", "Canceled"), 
+      cena_towaru, 
+      pmax(round(cena_towaru - wklad_wlasny, 2), kwota_kredytu)  
+    ),
+   
+    kwota_kredytu = ifelse(
+      stan_umowy %in% c("Refused", "Canceled"), 
+      0, 
+      kwota_kredytu
+    )
+  )
+
+head(data_cleaned13)
+
+
+
+# ********************************************************
+# 72. Modyfikacja danych z uwzględnieniem 12 rat w roku, oraz ustawienie ustawienie odpowiednich liczb rat
+# ********************************************************
+
+data_cleaned13 <- data_cleaned13 %>%
+  mutate(
+
+    liczba_rat = ifelse(
+      stan_umowy %in% c("Refused", "Canceled"), 
+      0,  
+      round(pmin(pmax(ceiling(kwota_kredytu / 10000) * 12, 12), 120))  
+    ),
+    dzien_ostatniej_raty = ifelse(
+      liczba_rat == 0, 
+      dzien_pierwszej_raty,  
+      dzien_pierwszej_raty + liczba_rat * 30  
+    ),
+    
+    roczna_rata = ifelse(
+      liczba_rat == 0, 
+      0, 
+      round(kwota_kredytu / (liczba_rat / 12), 2) 
+    )
+  )
+
+
+head(data_cleaned13)
+
+data_cleaned13 <- data_cleaned13 %>%
+  select(-procent_wkladu_wlasnego)
+
+
+
+# ********************************************************
+# 73.  Aktualizacja wartości w kolumnach dni dla Refused i Canceled
+# ********************************************************
+
+data_cleaned13 <- data_cleaned13 %>%
+  mutate(
+    dzien_pierwszej_wyplaty = ifelse(
+      stan_umowy %in% c("Refused", "Canceled"), 
+      0, 
+      dzien_pierwszej_wyplaty
+    ),
+    dzien_pierwszej_raty = ifelse(
+      stan_umowy %in% c("Refused", "Canceled"), 
+      0, 
+      dzien_pierwszej_raty
+    ),
+    dzien_ostatniej_raty = ifelse(
+      stan_umowy %in% c("Refused", "Canceled"), 
+      0, 
+      dzien_ostatniej_raty
+    )
+  )
+
+
+head(data_cleaned13)
+
+
+# ********************************************************
+# 74.  Aktualizacja wartości w kolumnie stosunek_kredytu dla Refused i Canceled
+# ********************************************************
+
+data_cleaned13 <- data_cleaned13 %>%
+  mutate(
+    stosunek_kwoty_kredytu = ifelse(
+      stan_umowy %in% c("Refused", "Canceled"), 
+      0,  
+      round(kwota_kredytu / roczna_rata, 2)  
+    )
+  )
+
+
+head(data_cleaned13$stosunek_kwoty_kredytu)
+
+
+
+
+
+
+
+# ********************************************************
+# 75. Zapisanie wyników do pliku jako 'finished'
+# ********************************************************
+output_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned_finished.csv"
+
+write.csv(data_cleaned13, output_path, row.names = FALSE)
+cat(paste("Zaktualizowane dane zapisano do pliku:", output_path, "\n"))
+
+
+# ********************************************************
+# 76. Aktualizacja README.md
+# ********************************************************
+new_content <- paste0(
+  "\n### 4.13. Zmiany w danych\n\n",
+  "1. W kolumnie `RATE_DOWN_PAYMENT` przekształcono wartości na procentowe, ograniczając je do maksymalnie 20%.\n",
+  "2. Brakujące wartości w kolumnie `AMT_ANNUITY` uzupełniono medianą.\n",
+  "3. Dodano zmienne analityczne:\n",
+  "   - `DOWN_PAYMENT_PERCENTAGE` (procentowy wkład własny).\n",
+  "   - `CREDIT_TO_ANNUITY_RATIO` (stosunek kwoty kredytu do rocznej raty).\n",
+  "   - `CREDIT_PERCENTAGE` (procent kredytu w stosunku do ceny towaru).\n",
+  "4. Usunięto kolumny: `DAYS_LAST_DUE_1ST_VERSION` i `DAYS_TERMINATION`.\n",
+  "5. Naprawiono relacje między kolumnami dotyczącymi dni, zapewniając logiczną spójność:\n",
+  "   - `DAYS_DECISION`, `DAYS_FIRST_DRAWING`, `DAYS_FIRST_DUE`, `DAYS_LAST_DUE`.\n",
+  "6. Kolumnę `AMT_APPLICATION` dostosowano, aby była zgodna z sumą `AMT_CREDIT` i `AMT_DOWN_PAYMENT`.\n",
+  "7. Ustalono minimalne wartości `AMT_CREDIT` i `AMT_ANNUITY` na 2000.\n",
+  "8. Wiersze z `stan_umowy` = 'Refused' lub 'Canceled':\n",
+  "   - Ustawiono `kwota_kredytu`, `roczna_rata`, `wklad_wlasny` na 0.\n",
+  "   - Wyzerowano wartości w kolumnach dniowych: `dzien_pierwszej_wyplaty`, `dzien_pierwszej_raty`, `dzien_ostatniej_raty`.\n",
+  "9. Kolumny `liczba_rat` i `roczna_rata` dostosowano do założenia 12 rat w roku.\n",
+  "10. Kolumna `stosunek_kwoty_kredytu` (stosunek kwoty kredytu do rocznej raty) ustawiona na 0 dla wierszy odrzuconych.\n",
+  "11. Zmieniono nazwy kolumn na bardziej czytelne, m.in.:\n",
+  "    - `SK_ID_PREV` → `id_poprzedniego_wniosku`\n",
+  "    - `SK_ID_CURR` → `id_klienta_banka`\n",
+  "    - `AMT_ANNUITY` → `roczna_rata`\n",
+  "    - `AMT_APPLICATION` → `wnioskowana_kwota`\n",
+  "    - `AMT_CREDIT` → `kwota_kredytu`\n",
+  "    - `AMT_DOWN_PAYMENT` → `wklad_wlasny`\n",
+  "    - `RATE_DOWN_PAYMENT` → `procent_wkladu_wlasnego`\n",
+  "    - `NAME_CONTRACT_STATUS` → `stan_umowy`\n",
+  "    - `DAYS_DECISION` → `dzien_decyzji`.\n",
+  "12. Ostateczne dane zapisano w pliku: `", basename(output_path), "`.\n\n---\n"
+)
+
+append_to_readme <- function(content, path) {
+  write(content, file = path, append = TRUE, sep = "\n")
+}
+
+append_to_readme(new_content, readme_path)
+cat("Zmiany zostały dopisane do README.md.\n")
+
+
+# Ścieżka do pliku README.md
+readme_path <- "C:/Users/user/Documents/GIT projekts/Analiza_danych-Projekt_Zespolowy2024-2025/README.md"
+
+# Funkcja do zmiany wyglądu w pliku README.md
+update_readme_formatting <- function(path) {
+  readme_content <- readLines(path)
+  readme_content <- gsub("^# (.*)$", "# \\1\n---", readme_content)  
+  readme_content <- gsub("^## (.*)$", "## \\1\n---", readme_content)  
+  readme_content <- gsub("^\\s*-\\s(.*)$", "  - \\1", readme_content)  
+  readme_content <- gsub("\\*\\*(.*)\\*\\*", "### \\1", readme_content)  
+  readme_content <- gsub("^-{3,}$", "---", readme_content) 
+  
+ 
+  writeLines(readme_content, path)
+  cat("Wygląd README.md został zaktualizowany.\n")
+}
+
+
+update_readme_formatting(readme_path)
+
+add_emoji_to_readme <- function(path) {
+  
+  readme_content <- readLines(path)
+
+  readme_content <- gsub("^# (.*)$", "🎯 \\1", readme_content)  
+  readme_content <- gsub("^## (.*)$", "⭐ \\1", readme_content) 
+  readme_content <- gsub("^-\\s", "- ✅ ", readme_content)  
+  
+  writeLines(readme_content, path)
+  cat("Emoji zostały dodane do README.md.\n")
+}
+
+
+add_emoji_to_readme(readme_path)
+
+
