@@ -18,7 +18,7 @@ install.packages('ggrepel')
 install.packages('gridExtra')
 # Do przekształcania danych.
 install.packages("reshape2")
-
+install.packages("here")
 # Ładujemy pakiety.
 library(ggplot2)
 library(tidyverse)
@@ -26,7 +26,7 @@ library(RColorBrewer)
 library(ggrepel)
 library(gridExtra)
 library(reshape2)
-
+library(here)
 # Komunikat
 cat("Pakiety zostały poprawnie załadowane.\n")
 
@@ -38,7 +38,7 @@ cat("Pakiety zostały poprawnie załadowane.\n")
 cat("Wczytywanie danych z pliku danych CSV...\n")
 
 # Ścieżka do pliku.
-dane <- "C:/Users/micha/Documents/Analiza_danych-Projekt_Zespolowy2024-2025/previous_application_cleaned_finished.csv"
+dane <- here("previous_application_cleaned_finished.csv")
 
 # Wczytanie danych z pliku CSV
 data <- read.csv(dane, stringsAsFactors = FALSE)
