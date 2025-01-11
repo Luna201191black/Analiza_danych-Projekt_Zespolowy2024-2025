@@ -1,13 +1,10 @@
----
-title: "<h1 style='font-size:40px;'>Raport Analizy Danych - Projekt Zespołowy 2024-2025</h1>"
-author:
-  - "<h2 style='font-size:30px;'>Yuliya Sharkova</h2>"
-  - "<h2 style='font-size:30px;'>Michał Owczarek</h2>"
-  - "<h2 style='font-size:30px;'>Aleksander Urbański</h2>"
-output: 
-  html_document:
-    keep_md: true
----
+# Raport Analizy Danych - Projekt Zespołowy 2024-2025 {class="title"}
+
+#### Autorzy: {class="author"}
+- Yuliya Sharkova
+- Michał Owczarek
+- Aleksander Urbański
+
 
 🎯 Raport Analizy Danych - Projekt Zespołowy 2024-2025
 ⭐ 1. Wprowadzenie
