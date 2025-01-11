@@ -66,6 +66,7 @@ ggplot(data, aes(x = wnioskowana_kwota)) +
                    theme_minimal() +
   scale_x_continuous(labels = scales::comma, limits = c(0, 3000000), breaks = seq(0, 3000000, by = 500000)) +
   scale_y_continuous(labels = scales::comma, limits = c(0, 3000), breaks = seq(0, 3000, by = 500))
+ggsave("Rozklad_wnioskowanej_kwoty.png", plot = last_plot(), width = 8, height = 6, dpi = 300)
 
 # Interpretacja:
 # Większość wniosków dotyczy niewielkich kwot, co jest zauważalne po wysokim słupku w przedziale poniżej 500 000,
@@ -80,6 +81,7 @@ ggplot(data, aes(x = kwota_kredytu)) +
   theme_minimal() +
   scale_x_continuous(labels = scales::comma, limits = c(0, 3000000), breaks = seq(0, 3000000, by = 500000)) +
   scale_y_continuous(labels = scales::comma, limits = c(0, 3000), breaks = seq(0, 3000, by = 500))
+ggsave("Rozklad_kwoty_kredytu.png", plot = last_plot(), width = 8, height = 6, dpi = 300)
 
 # Interpretacja:
 # Zdecydowana większość wniosków dotyczy niskich kwot, co jest zauważalne po wysokim słupku w przedziale poniżej 500 000,
@@ -95,6 +97,7 @@ ggplot(data, aes(x = wklad_wlasny)) +
   theme_minimal() +
   scale_x_continuous(labels = scales::comma, limits = c(0, 100000), breaks = seq(0, 100000, by = 10000)) +
   scale_y_continuous(labels = scales::comma, limits = c(0, 2500), breaks = seq(0, 2500, by = 500))
+ggsave("Rozklad_wkladu_wlasnego.png", plot = last_plot(), width = 8, height = 6, dpi = 300)
 
 # Interpretacja:
 # Największa liczba wniosków dotyczy wkładów własnych w przedziale od 40 000 do 50 000, wskazując na koncentrację danych w tym zakresie.
@@ -109,6 +112,7 @@ ggplot(data, aes(x = cena_towaru)) +
   theme_minimal() +
   scale_x_continuous(labels = scales::comma, limits = c(0, 3000000), breaks = seq(0, 3000000, by = 500000)) +
   scale_y_continuous(labels = scales::comma, limits = c(0, 3000), breaks = seq(0, 3000, by = 500))
+ggsave("Rozklad_cen_towarow.png", plot = last_plot(), width = 8, height = 6, dpi = 300)
 
 # Interpretacja:
 # Największa liczba wniosków dotyczy towarów o cenie poniżej 500 000, co jest zauważalne po wysokim słupku po lewej stronie,
@@ -122,7 +126,8 @@ ggplot(data, aes(x = roczna_rata)) +
   theme_minimal() +
   scale_x_continuous(labels = scales::comma, limits = c(0, 250000), breaks = seq(0, 250000, by = 50000)) +
   scale_y_continuous(labels = scales::comma, limits = c(0, 10000), breaks = seq(0, 10000, by = 1000))
-  
+ggsave("Rozklad_rocznej_raty.png", plot = last_plot(), width = 8, height = 6, dpi = 300)
+
 # Interpretacja:
 # Dominują nieskie wartości, gdzie większość wniosków dotyczy rat poniżej 50 000, co jest zauważalne po wysokim słupku po lewej stronie,
 # gdy w tym samym czasie liczba wniosków znacząco maleje wraz ze wzrostem wysokości raty.
@@ -140,6 +145,7 @@ ggplot(data, aes(x = wnioskowana_kwota, fill = typ_umowy)) +
   scale_x_continuous(labels = scales::comma, limits = c(0, 250000), breaks = seq(0, 250000, by = 50000)) +
   scale_y_continuous(labels = scales::comma, limits = c(0, 5000), breaks = seq(0, 5000, by = 500))
   scale_fill_brewer(palette = "Set2")
+ggsave("Rozklad_wnioskowanej_kwoty_typ_umowy.png", plot = last_plot(), width = 8, height = 6, dpi = 300)
   
 # Interpretacja:
 # Największa liczba wniosków dotyczy kredytów gotówkowych, szczególnie w przedziale około 100 000, gdy w tym samym czasie
@@ -155,6 +161,7 @@ ggplot(data, aes(x = cena_towaru, fill = kategoria_portfela)) +
   theme_minimal() +
   scale_x_continuous(labels = scales::comma, limits = c(0, 2500000), breaks = seq(0, 2500000, by = 500000)) +
   scale_y_continuous(labels = scales::comma, limits = c(0, 2000), breaks = seq(0, 5000, by = 500))
+ggsave("Rozklad_cen_towarow_kategoria_portfela.png", plot = last_plot(), width = 10, height = 6, dpi = 300)
 
 # Interpretacja:
 # Większość wniosków dotyczy towarów o niskich cenach (poniżej 500 000) niezależnie od kategorii.
@@ -164,13 +171,26 @@ ggplot(data, aes(x = cena_towaru, fill = kategoria_portfela)) +
 # Komunikat
 cat("Zależności między poszczególnymi zmiennymi...\n")
 
-# Zależność pomiędzy wnioskowaną kwotą a kwotą otrzymanego kredytu.
+# Zależność pomiędzy wnioskowaną kwotą a kwotą otrzymanego kredytu.(Poprawiony troche kod!)
 ggplot(data, aes(x = wnioskowana_kwota, y = kwota_kredytu, color = typ_umowy)) +
   geom_point(alpha = 0.6) +
-  labs(title = "Zależność między wnioskowaną kwotą a kwotą kredytu",
-       x = "Wnioskowana kwota", y = "Kwota kredytu") +
+  labs(
+    title = "Zależność między wnioskowaną kwotą a kwotą kredytu",
+    x = "Wnioskowana kwota", 
+    y = "Kwota kredytu"
+  ) +
   theme_minimal() +
-  scale_color_brewer(palette = "Set1")
+  scale_color_brewer(palette = "Set1") +
+  scale_x_continuous(labels = scales::comma) + 
+  scale_y_continuous(labels = scales::comma)   
+ggsave(
+  filename = "Zaleznosc_wnioskowana_kwota_kwota_kredytu.png",  
+  plot = last_plot(),                                         
+  width = 10,                                               
+  height = 6,                                                
+  dpi = 300                                                
+)
+
 
 # Zależność pomiędzy procentem kredytu a wkładem własnym.
 ggplot(data, aes(x = procent_kredytu, y = wklad_wlasny, color = status_ubezpieczenia)) +
@@ -180,6 +200,13 @@ ggplot(data, aes(x = procent_kredytu, y = wklad_wlasny, color = status_ubezpiecz
   theme_minimal() +
   scale_y_continuous(labels = scales::comma)+
   scale_color_gradient(low = "blue", high = "red")
+ggsave(
+  filename = "Zaleznosc_procent_kredytu_wklad_wlasny.png",  
+  plot = last_plot(),                                     
+  width = 10,                                              
+  height = 6,                                         
+  dpi = 300                                              
+)
 
 
 # Komunikat
@@ -192,6 +219,15 @@ ggplot(data, aes(x = cel_kredytu)) +
   theme_minimal()  +
   coord_flip()
 
+
+ggsave(
+  filename = "Rozklad_celow_kredytow.png", 
+  plot = last_plot(),                      
+  width = 12,                              
+  height = 8,                             
+  dpi = 300                               
+)
+
 # Stan umowy w relacji do typu klienta.
 ggplot(data, aes(x = stan_umowy, fill = rodzaj_klienta)) +
   geom_bar(position = "fill", alpha = 0.8) +
@@ -199,6 +235,14 @@ ggplot(data, aes(x = stan_umowy, fill = rodzaj_klienta)) +
        x = "Stan umowy", y = "Udział", fill = "Rodzaj klienta") +
   theme_minimal() +
   scale_fill_brewer(palette = "Set2")
+ggsave(
+  filename = "Stan_umowy_a_rodzaj_klienta.png",  
+  plot = last_plot(),                           
+  width = 10,                                   
+  height = 6,                                   
+  dpi = 300                                     
+)
+
 
 
 # Komunikat
@@ -212,11 +256,28 @@ ggplot(data, aes(x = dzien_tygodnia_procesu, y = godzina_rozpoczecia_procesu)) +
   theme_minimal() +
   scale_fill_gradient(low = "white", high = "orange")
 
+
+ggsave(
+  filename = "Rozklad_liczby_wnioskow_w_czasie.png",  
+  plot = last_plot(),                                 
+  width = 10,                                         
+  height = 6,                                         
+  dpi = 300                                           
+)
+
+
 # Liczba wniosków na przedstrzeni dni decyzyjnych.
 ggplot(data, aes(x = dzien_decyzji)) +
   geom_line(stat = "count", color = "red") +
   labs(title = "Liczba wniosków w czasie", x = "Dzień decyzji", y = "Liczba wniosków") +
   theme_minimal()
+ggsave(
+  filename = "Liczba_wnioskow_w_czasie.png",  
+  plot = last_plot(),                         
+  width = 10,                                 
+  height = 6,                                 
+  dpi = 300                                 
+)
 
 # Komunikat
 cat("Specyficzne przypadki...\n")
@@ -230,6 +291,15 @@ ggplot(data, aes(x = cel_kredytu, y = kwota_kredytu)) +
   scale_y_continuous(labels = scales::comma) +
   coord_flip()
 
+
+ggsave(
+  filename = "Kwota_kredytu_w_zaleznosci_od_celu_kredytu.png",  
+  plot = last_plot(),                                           
+  width = 12,                                                  
+  height = 8,                                                  
+  dpi = 300                                                 
+)
+
 # Rozkład liczby rat dla każdej kategorii produktu z osobna.
 dane <- as.data.frame(data)
 ggplot(dane, aes(x = kategoria_produktu, y = liczba_rat)) +
@@ -238,5 +308,14 @@ ggplot(dane, aes(x = kategoria_produktu, y = liczba_rat)) +
        x = "Kategoria produktu", y = "Liczba rat") +
   theme_minimal() +
   coord_flip()
+
+ggsave(
+  filename = "Rozklad_liczby_rat_kategoria_produktu.png", 
+  plot = last_plot(),                                      
+  width = 12,                                           
+  height = 8,                                             
+  dpi = 300                                               
+)
+
 
 

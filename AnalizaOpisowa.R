@@ -120,21 +120,33 @@ library(scales)   # dla funkcji comma (formatowanie osi)
 # 2. Zakładamy, że mamy ramkę danych 'data', a kolumna 'wnioskowana_kwota' jest liczbowa
 
 # 3. Tworzymy boxplot na skali logarytmicznej
-ggplot(data, aes(x = "", y = wnioskowana_kwota)) +
- geom_boxplot(fill = "lightblue") +
- 
- # Ustawienie skali log10 na osi Y:
- scale_y_log10(labels = comma) +
- 
- # Opisy osi i tytuł wykresu
- labs(
-  title = "Boxplot: Wnioskowana Kwota (skala log10)",
-  x = "",
-  y = "Wnioskowana Kwota (log10)"
- ) +
- 
- # Minimalistyczny wygląd wykresu
- theme_minimal()
+# Załadowanie potrzebnych bibliotek
+library(ggplot2)
+library(scales)
+
+# Tworzenie wykresu i przypisanie go do zmiennej
+boxplot_plot <- ggplot(data, aes(x = "", y = wnioskowana_kwota)) +
+  geom_boxplot(fill = "lightblue") +
+  
+  # Ustawienie skali log10 na osi Y:
+  scale_y_log10(labels = comma) +
+  
+  # Opisy osi i tytuł wykresu
+  labs(
+    title = "Boxplot: Wnioskowana Kwota (skala log10)",
+    x = "",
+    y = "Wnioskowana Kwota (log10)"
+  ) +
+  
+  # Minimalistyczny wygląd wykresu
+  theme_minimal()
+ggsave(
+  filename = "Boxplot_Wnioskowana_Kwota_Log10.png", 
+  plot = boxplot_plot,                            
+  width = 8,                                       
+  height = 6,                                      
+  dpi = 300                                       
+)
 
 
 # 5.2 Możemy obliczyć IQR i wyznaczyć przedziały, by zidentyfikować outliers
@@ -165,19 +177,50 @@ cat("Liczba wierszy uznanych za outliers:", nrow(outliers_data), "\n")
 
 # 6. ZALEŻNOŚCI MIĘDZY ZMIENNYMI NUMERYCZNYMI (KORELACJE)
 
-library(corrplot)
 
+if (!require("corrplot")) install.packages("corrplot")
+if (!require("ggplot2")) install.packages("ggplot2")
+if (!require("reshape2")) install.packages("reshape2")
+
+
+library(corrplot)
+library(ggplot2)
+library(reshape2)
+
+# Wyświetlamy komunikatu
 cat("\nMacierz korelacji dla zmiennych numerycznych\n")
 
+# Wybieramy  kolumny numeryczne
 num_cols <- data %>% select_if(is.numeric)
+
+# Obliczamy  macierzy korelacji
 cor_matrix <- cor(num_cols, use = "complete.obs")
 
-# Wyświetlanie macierzy w konsoli
+# Wyświeamy macierz w konsoli
 print(cor_matrix)
 
-# Wizualizacja macierzy korelacji
+# Wizualizacja macierzy korelacji za pomocą corrplot
+png(filename = "Macierz_Korelacji_Corrplot.png", width = 800, height = 800)
 corrplot(cor_matrix, method = "circle", type = "lower", tl.cex = 0.7,
-     main = "Macierz korelacji")
+         main = "Macierz korelacji")
+dev.off()
+
+# Wizualizacja macierzy korelacji za pomocą ggplot2 ---
+
+# Konwertowanie macierzy korelacji do formatu długiego
+cor_melted <- melt(cor_matrix)
+
+# Tworzenie wykresu macierzy korelacji
+plot_cor <- ggplot(data = cor_melted, aes(x = Var1, y = Var2, fill = value)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", midpoint = 0,
+                       limit = c(-1, 1), name = "Korelacja") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) +
+  labs(title = "Macierz Korelacji", x = "", y = "")
+
+# Zapisujemy  wykres jako plik PNG
+ggsave("Macierz_Korelacji_ggplot.png", plot = plot_cor, width = 10, height = 8, dpi = 300)
 
 # WNIOSKI:
 # Pozwala wykryć, czy np. 'wnioskowana_kwota' jest silnie skorelowana z 'kwota_kredytu' lub innymi zmiennymi.

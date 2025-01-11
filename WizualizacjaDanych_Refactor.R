@@ -525,7 +525,7 @@ ggplot(data, aes(x = stan_umowy, fill = rodzaj_klienta)) +
     title = "Stan umowy w zależności od rodzaju klienta",
     x = "Stan umowy",
     y = "Proporcja"
-  ) +
+  ) +s
   theme_minimal()
 
 # Interpretacja:
