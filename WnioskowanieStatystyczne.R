@@ -68,7 +68,8 @@ data_plot <- data.frame(
   kwota_kredytu = c(group1, group2)
 )
 
-
+install.packages("ggplot2")
+library(ggplot2)
 ggplot(data_plot, aes(x = grupa, y = kwota_kredytu, fill = grupa)) +
   geom_boxplot() +
   labs(title = "Porównanie kwot kredytu dla Home Renovation i Vacation",
@@ -76,8 +77,8 @@ ggplot(data_plot, aes(x = grupa, y = kwota_kredytu, fill = grupa)) +
        y = "Kwota kredytu") +
   theme_minimal() +
   scale_fill_brewer(palette = "Set3") +
-  theme(legend.position = "none")+
-ggsave("t_student.png")
+  theme(legend.position = "none")
+
 
 # Dodatkowe uwagi
 shapiro.test(group1)
@@ -110,8 +111,10 @@ ggplot(data, aes(x = liczba_rat, y = kwota_kredytu)) +
   labs(title = "Regresja liniowa dla liczby rat oraz kwoty kredytu",
        x = "Liczba rat",
        y = "Kwota kredytu") +
+  scale_y_continuous(labels = scales::comma)+
+  
   theme_minimal()+
-  ggsave("regresja.png")
+  ggsave("regresja1.png")
 
 # ********************************************************
 
@@ -136,16 +139,27 @@ ggplot(data = data) +
   geom_mosaic(aes(x = product(rodzaj_platnosci, stan_umowy), 
                   fill = stan_umowy)) +
   labs(title = "Zależnośc rodzaju płatności i stanu umowy",
-       x = "Rodzaj Płatności",
-       y = "Proporcje") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-  scale_fill_brewer(palette = "Set3", name = "Stan Umowy")+
-  ggsave("chi-kwadrat1.png")
+       x = "Stan umowy",
+       y = "Rodzaj Płatności") +
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 4, margin = margin(t = 10)),
+    axis.text.y = element_text(size = 4, margin = margin(r = 25)),
+    axis.title.x = element_text(size = 10, margin = margin(t = 15)),
+    axis.title.y = element_text(size = 10, margin = margin(r = 15)),
+    plot.title = element_text(size = 10, face = "bold", hjust = 0.5, margin = margin(b = 15)),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 8)
+  ) +
+  scale_fill_brewer(palette = "Set2", name = "Stan Umowy") +
+  coord_fixed(ratio = 1)+
+  ggsave("chi_kwadrat11.png")
+ 
+  
 
 # ********************************************************
 
-# 4.Test chi-kwadrat dla cel kredytu i stanu umowy
+# 4.Test chi-kwadrat dla celu kredytu i stanu umowy
 # H0: Cel kredytu i stan umowy są od siebie niezależne
 # HA: Cel kredytu i stan umowy są od siebie zależne
 contingency_table <- table(data$cel_kredytu, data$stan_umowy)
@@ -161,20 +175,38 @@ install.packages("dplyr")
 library(dplyr)
 install.packages("ggplot2")
 library(ggplot2)
+install.packages("forcats")
+library(forcats)
 data$cel_kredytu <- recode(data$cel_kredytu,
                          "Building a house or an annex" = "Build house",
                          "Buying a holiday home / land" = "Holiday home",
                          "Gasification / water supply" = "Gasification",
                          "Wedding / gift / holiday" = "Wedding")
+View(data$cel_kredytu)
+prog <- 6
+data <- data %>%
+  mutate(cel_kredytu = fct_lump(cel_kredytu, n = prog, other_level = "Inne"))
+
 ggplot(data = data) +
   geom_mosaic(aes(x = product(cel_kredytu, stan_umowy), fill = stan_umowy)) +
   labs(title = "Zależność między celem kredytu a stanem umowy",
        x = "Stan Umowy",
        y = "Cel Kredytu") +
-  theme_minimal() +
-  theme(axis.text.y = element_text(size = 5, hjust = 1)) +
-  scale_fill_brewer(palette = "Set3", name = "Stan Umowy")+
-  ggsave("chi_kwadrat2.png")
+  theme_minimal(base_size = 12) +
+  theme(
+    axis.text.y = element_text(size = 6, hjust = 1, margin = margin(r = 30)),
+    axis.text.x = element_text(size = 10, angle = 45, hjust = 1, margin = margin(t = 10)),
+    axis.title.x = element_text(size = 10, margin = margin(t = 20)),
+    axis.title.y = element_text(size = 10, margin = margin(r = 20)),
+    plot.title = element_text(size = 10, face = "bold", hjust = 0.5, margin = margin(b = 20)),
+    legend.title = element_text(size = 10),
+    legend.text = element_text(size = 10)
+  ) +
+  scale_fill_brewer(palette = "Set3", name = "Stan Umowy") +
+  coord_fixed(ratio = 1)+
+  ggsave("chi_kwadrat22.png")
+  
+
 
 # ********************************************************
 
@@ -189,14 +221,23 @@ summary(anova_test)
 # Wartość p (0,252) jest większe niż poziom istnotności 0,05
 # Brak podstaw do odrzucenia hipotezy zerowej, co oznacza, że średnia kwota kredytu nie różni się
 # istotnie między poszczególnymi celami kredytu
-
+prog <- 6
+data <- data %>%
+  mutate(cel_kredytu = fct_lump(cel_kredytu, n = prog, other_level = "Inne"))
 ggplot(data, aes(x = cel_kredytu, y = kwota_kredytu, fill = cel_kredytu)) +
   geom_boxplot() +
   labs(title = "Porównanie kwoty kredytu dla różnych celów kredytu",
        x = "Cel kredytu",
        y = "Kwota kredytu") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1, size = 8, margin = margin(t = 10)),
+    axis.title.x = element_text(size = 12, margin = margin(t = 15)),
+    axis.title.y = element_text(size = 12, margin = margin(r = 15)),
+    plot.title = element_text(size = 14, face = "bold", hjust = 0.5, margin = margin(b = 15)) 
+  ) +
   scale_fill_brewer(palette = "Set3", name = "Cel kredytu")+
-ggsave("anova_plot.png")
+  scale_y_continuous(labels = scales::comma)+
+  ggsave("anova.png")
+
 
