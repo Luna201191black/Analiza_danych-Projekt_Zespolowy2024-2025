@@ -1,11 +1,20 @@
-# Raport. Analiza bazy imformacji kredytowej.Projekt Zespołowy 2024-2025 
+<!-- Poprawa stylizacji nasego raportu -->
+<style>
+h1 { color: purple; font-size: 28px; font-weight: bold; }
+h2 { color: purple; font-size: 24px; font-weight: bold; }
+h3 { color: darkgreen; font-size: 20px; font-weight: bold; }
+p { color: black; font-size: 16px; }
+span.red { color: purple; font-weight: bold; }
+span.teal { color: darkgreen; font-style: italic; }
+</style>
 
-## Autorzy: 
+# Raport: <span class='teal'>Projekt zespołowy.Analiza bazy informacji kredytowej.</span>
 
--   Yuliya Sharkova
--   Michał Owczarek
--   Aleksander Urbański
+## <span style='color:darkgreen;'>Autorzy:</span>
 
+- <span class='darkgreen'>Yuliya Sharkova</span>
+- <span class='darkgreen'>Michał Owczarek</span>
+- <span class='darkgreen'>Aleksander Urbański</span>
 
 ## 1. Wprowadzenie
 
@@ -472,7 +481,7 @@ HA: Średnia kwota kredytu nie jest taka sama dla wszystkich celów kredytu
 -   Kredyty gotówkowe („Cash loans”) mają najniższy stosunek kwoty kredytu (mediana = 0.00), co sugeruje mniejsze znaczenie tej grupy.
 -   Kredyty konsumenckie („Consumer loans”) mają najwyższy stosunek kwoty kredytu (mediana = 6.00), co wskazuje na ich większe użycie przy dużych transakcjach.
 
-## 6.2.1 Wnioski końcowe
+### 6.2.1 Wnioski końcowe
 
 ### 6.2.2 Profil kredytów
 
