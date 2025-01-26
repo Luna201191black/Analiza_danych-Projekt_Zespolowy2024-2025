@@ -267,7 +267,7 @@ Wykres słupkowy prezentuje udział różnych stanów umowy (`Approved`, `Refuse
 
 ## 5.4 Porównanie procentu wkłądu własnego w zależności od stanu umowy
 
-![Porównanie procentu wkładu własnego w zależności od stanu umowy](Test_Statystyczny_4)
+![Porównanie procentu wkładu własnego w zależności od stanu umowy](Test_Statystyczny_4.png)
 
 ### Interpretacja wyników
 
